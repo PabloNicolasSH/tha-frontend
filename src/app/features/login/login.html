@@ -1,0 +1,125 @@
+<main class="auth">
+  <section class="auth__art" aria-hidden="true">
+    <img src="brand/tha-logo.svg" alt="" />
+  </section>
+
+  <section class="auth__panel">
+    <div class="auth__box">
+      @if (step() === 'credentials') {
+        <h1 data-rise>Entra en la selva</h1>
+        <p class="auth__lead" data-rise>Accede con tu cuenta de la federación para crear y gestionar tus actividades.</p>
+
+        @if (notice(); as message) {
+          <p class="auth__notice" role="status">{{ message }}</p>
+        }
+        @if (error(); as message) {
+          <p class="auth__error" role="alert">{{ message }}</p>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="auth__form" data-rise>
+          <div class="th-field" [attr.data-invalid]="form.controls.email.touched && form.controls.email.invalid">
+            <div class="th-float">
+              <input class="th-input" id="email" type="email" formControlName="email" autocomplete="username" placeholder=" " />
+              <label class="th-float__label" for="email">Email</label>
+            </div>
+            @if (form.controls.email.touched && form.controls.email.invalid) {
+              <span class="th-error">Escribe un email válido.</span>
+            }
+          </div>
+
+          <tha-password-field
+            fieldId="password"
+            label="Contraseña"
+            formControlName="password"
+            autocomplete="current-password"
+            [error]="form.controls.password.touched && form.controls.password.invalid ? 'Escribe tu contraseña.' : null"
+          />
+
+          <label class="th-check">
+            <input type="checkbox" formControlName="rememberMe" />
+            Mantener sesión iniciada
+          </label>
+
+          <button class="th-btn th-btn--primary th-btn--lg" type="submit" [disabled]="busy()">
+            {{ busy() ? 'Entrando…' : 'Entrar' }}
+          </button>
+        </form>
+
+        @if (providers().length) {
+          <div class="th-divider" data-rise>o</div>
+          <div class="auth__sso" data-rise>
+            @for (provider of providers(); track provider.id) {
+              <!-- navegación completa: el proveedor redirige de vuelta al terminar -->
+              <a class="th-btn th-btn--lg" [href]="provider.loginUrl">Entrar con {{ provider.name }}</a>
+            }
+          </div>
+        }
+
+        <p class="auth__switch" data-rise>¿Aún no tienes cuenta? <a routerLink="/registro">Solicítala</a></p>
+      } @else {
+        <h1 data-rise>Verificación en dos pasos</h1>
+        <p class="auth__lead" data-rise>
+          @switch (codeType()) {
+            @case ('TOTP') { Escribe el código de 6 dígitos que muestra tu app autenticadora. }
+            @case ('EMAIL') { Escribe el código de 6 dígitos que te hemos enviado por correo. }
+            @case ('RECOVERY') { Escribe uno de tus códigos de recuperación. Cada uno sirve una sola vez. }
+          }
+        </p>
+
+        @if (notice(); as message) {
+          <p class="auth__notice" role="status">{{ message }}</p>
+        }
+        @if (error(); as message) {
+          <p class="auth__error" role="alert">{{ message }}</p>
+        }
+
+        <div class="th-tabs th-tabs--static" role="tablist" aria-label="Método de verificación" data-rise>
+          @for (type of codeTypes(); track type) {
+            <button
+              class="th-tab"
+              role="tab"
+              type="button"
+              [attr.aria-selected]="codeType() === type"
+              (click)="chooseType(type)"
+            >
+              {{ codeLabels[type] }}
+            </button>
+          }
+        </div>
+
+        <form (submit)="$event.preventDefault(); verify()" novalidate class="auth__form" data-rise>
+          <div class="th-field">
+            <label class="th-label" for="code">{{ codeType() === 'RECOVERY' ? 'Código de recuperación' : 'Código' }}</label>
+            <input
+              #codeInput
+              class="th-input th-code"
+              [class.th-code--text]="codeType() === 'RECOVERY'"
+              id="code"
+              [formControl]="code"
+              [attr.inputmode]="codeType() === 'RECOVERY' ? 'text' : 'numeric'"
+              [attr.maxlength]="codeType() === 'RECOVERY' ? 14 : 6"
+              [attr.autocomplete]="codeType() === 'RECOVERY' ? 'off' : 'one-time-code'"
+              [attr.placeholder]="codeType() === 'RECOVERY' ? 'XXXXX-XXXXX' : '000000'"
+              autocapitalize="none"
+              spellcheck="false"
+              (input)="onCodeInput()"
+            />
+          </div>
+
+          <button class="th-btn th-btn--primary th-btn--lg" type="submit" [disabled]="busy() || code.invalid">
+            {{ busy() ? 'Verificando…' : 'Verificar' }}
+          </button>
+        </form>
+
+        <div class="auth__links" data-rise>
+          @if (codeType() === 'EMAIL') {
+            <button class="auth__link" type="button" (click)="resend()" [disabled]="resendIn() > 0">
+              {{ resendIn() > 0 ? 'Reenviar código en ' + resendIn() + ' s' : 'Reenviar código' }}
+            </button>
+          }
+          <button class="auth__link" type="button" (click)="backToCredentials()">Volver</button>
+        </div>
+      }
+    </div>
+  </section>
+</main>

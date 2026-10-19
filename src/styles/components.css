@@ -1,0 +1,202 @@
+/* Tha — componentes base v0.1 (prefijo th-)
+   Prototipo de referencia en CSS puro. En Angular cada bloque se convierte en un componente standalone
+   con estas mismas clases. Sin PrimeNG. Requiere tokens.css. */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 400 var(--text-md)/1.55 var(--font-ui);
+}
+h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: -0.02em; line-height: 1.05; }
+p { text-wrap: pretty; margin: 0; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.th-num { font-variant-numeric: tabular-nums; }
+.th-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Botón ---------- */
+.th-btn {
+  --_bg: var(--surface); --_fg: var(--ink); --_bgh: var(--surface-2);
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  min-height: var(--control-h); padding: 0 var(--s-4);
+  font: 600 var(--text-sm)/1 var(--font-ui); letter-spacing: 0.005em;
+  color: var(--_fg); background: var(--_bg); border: 0; border-radius: var(--r-md);
+  box-shadow: var(--shadow-1); cursor: pointer; white-space: nowrap;
+  text-decoration: none; /* también para <a class="th-btn"> */
+  transition-property: background-color, box-shadow, scale, color; transition-duration: var(--dur-base); transition-timing-function: var(--ease-out);
+}
+.th-btn:hover { background: var(--_bgh); }
+.th-btn:active { scale: var(--press-scale); }
+.th-btn::after { content: ""; position: absolute; inset: -2px 0; } /* hit area ≥ 44 en táctil */
+.th-btn[disabled], .th-btn[aria-disabled="true"] { opacity: 0.45; pointer-events: none; }
+.th-btn--primary { --_bg: var(--brand); --_fg: var(--on-brand); --_bgh: var(--brand-hover); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.08) inset, 0 1px 2px rgb(35 26 56 / 0.25); }
+.th-btn--primary:active { background: var(--brand-press); }
+.th-btn--tusk { --_bg: var(--accent); --_fg: var(--accent-ink); --_bgh: color-mix(in oklab, var(--accent) 88%, black); box-shadow: none; }
+.th-btn--ghost { --_bg: transparent; --_bgh: var(--surface-2); box-shadow: none; }
+.th-btn--danger { --_bg: var(--danger-tint); --_fg: var(--danger); --_bgh: color-mix(in oklab, var(--danger-tint) 85%, var(--danger)); box-shadow: none; }
+.th-btn--lg { min-height: 48px; padding: 0 var(--s-5); font-size: var(--text-md); }
+.th-btn--icon { width: var(--control-h); padding: 0; }
+.th-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+@media (pointer: coarse) { .th-btn { min-height: var(--control-h-touch); } }
+
+/* ---------- Campo, input, select, textarea ---------- */
+.th-field { display: grid; gap: 6px; }
+.th-label { font: 600 var(--text-sm)/1.2 var(--font-ui); color: var(--ink); }
+.th-hint  { font-size: var(--text-xs); color: var(--ink-2); }
+.th-error { font-size: var(--text-xs); color: var(--danger); font-weight: 500; }
+.th-input, .th-select, .th-textarea {
+  width: 100%; min-height: var(--control-h); padding: 0 var(--s-3);
+  font: 400 var(--text-md)/1.2 var(--font-ui); color: var(--ink);
+  background: var(--surface); border: 0; border-radius: var(--r-md);
+  box-shadow: 0 0 0 1px var(--line-strong) inset;
+  transition: box-shadow var(--dur-base) var(--ease-out);
+  appearance: none;
+}
+.th-textarea { padding: var(--s-3); min-height: 96px; resize: vertical; line-height: 1.5; }
+.th-input::placeholder { color: var(--ink-3); }
+.th-input:hover, .th-select:hover, .th-textarea:hover { box-shadow: 0 0 0 1px var(--ink-3) inset; }
+.th-input:focus, .th-select:focus, .th-textarea:focus { outline: none; box-shadow: 0 0 0 2px var(--focus) inset; }
+.th-field[data-invalid="true"] .th-input { box-shadow: 0 0 0 2px var(--danger) inset; }
+.th-select {
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2375698a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+}
+/* Importe: input con símbolo y cifras tabulares */
+.th-money { position: relative; }
+.th-money .th-input { padding-right: 34px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+.th-money::after { content: "€"; position: absolute; right: 14px; top: 50%; translate: 0 -50%; color: var(--ink-3); pointer-events: none; }
+
+/* ---------- Checkbox / radio / switch ---------- */
+.th-check { display: inline-flex; align-items: center; gap: var(--s-3); cursor: pointer; min-height: 28px; }
+.th-check input { appearance: none; margin: 0; width: 20px; height: 20px; border-radius: var(--r-sm); background: var(--surface);
+  box-shadow: 0 0 0 1px var(--line-strong) inset; display: grid; place-items: center; cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
+.th-check input[type="radio"] { border-radius: var(--r-full); }
+.th-check input:checked { background: var(--brand); box-shadow: none; }
+.th-check input:checked::after { content: ""; width: 10px; height: 6px; border: 2px solid var(--on-brand); border-top: 0; border-right: 0; rotate: -45deg; translate: 0 -1px; }
+.th-check input[type="radio"]:checked::after { width: 8px; height: 8px; border: 0; background: var(--on-brand); border-radius: 50%; rotate: 0deg; translate: 0; }
+.th-switch { position: relative; width: 40px; height: 24px; appearance: none; margin: 0; border-radius: var(--r-full); background: var(--surface-3); cursor: pointer; transition: background-color var(--dur-base) var(--ease-out); }
+.th-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / .3); transition: translate var(--dur-base) var(--ease-out); }
+.th-switch:checked { background: var(--brand); }
+.th-switch:checked::after { translate: 16px 0; }
+
+/* ---------- Badge y chip ---------- */
+.th-badge { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: var(--r-full);
+  font: 600 var(--text-xs)/1 var(--font-ui); background: var(--surface-2); color: var(--ink-2); }
+.th-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.th-badge--brand   { background: var(--brand-tint);   color: var(--brand); }
+.th-badge--success { background: var(--success-tint); color: var(--success); }
+.th-badge--danger  { background: var(--danger-tint);  color: var(--danger); }
+.th-badge--warning { background: var(--warning-tint); color: var(--warning); }
+.th-badge--tusk    { background: var(--accent);       color: var(--accent-ink); }
+
+/* ---------- Panel (card) y estadística ---------- */
+.th-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow-1); padding: var(--s-5); }
+.th-card--flat { box-shadow: none; background: var(--surface-2); }
+.th-stat { display: grid; gap: 4px; }
+.th-stat__label { font-size: var(--text-sm); color: var(--ink-2); }
+.th-stat__value { font: 700 var(--text-xl)/1.1 var(--font-display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.th-stat__delta { font-size: var(--text-sm); font-weight: 600; font-variant-numeric: tabular-nums; }
+.th-up { color: var(--success); } .th-down { color: var(--danger); }
+
+/* ---------- Pestañas ---------- */
+.th-tabs { display: inline-flex; gap: 2px; padding: 4px; background: var(--surface-2); border-radius: calc(var(--r-md) + 4px); position: relative; }
+.th-tab { position: relative; z-index: 1; min-height: 32px; padding: 0 var(--s-4); border: 0; background: none; border-radius: var(--r-md);
+  font: 600 var(--text-sm)/1 var(--font-ui); color: var(--ink-2); cursor: pointer; transition: color var(--dur-base) var(--ease-out); }
+.th-tab:hover { color: var(--ink); }
+.th-tab[aria-selected="true"] { color: var(--ink); }
+.th-tabs__thumb { position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 0; width: 0; background: var(--surface); border-radius: var(--r-md); box-shadow: var(--shadow-1); }
+
+/* ---------- Tabla ---------- */
+.th-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--text-sm); }
+.th-table th { text-align: left; font-weight: 600; color: var(--ink-2); padding: 10px var(--s-4); background: var(--surface-2); }
+.th-table th:first-child { border-radius: var(--r-md) 0 0 var(--r-md); }
+.th-table th:last-child  { border-radius: 0 var(--r-md) var(--r-md) 0; }
+.th-table td { padding: 14px var(--s-4); border-bottom: 1px solid var(--line); }
+.th-table tbody tr { transition: background-color var(--dur-fast) var(--ease-out); }
+.th-table tbody tr:hover { background: var(--surface-2); }
+.th-table .th-r { text-align: right; font-variant-numeric: tabular-nums; }
+.th-table tfoot td { border: 0; font-weight: 700; padding-top: var(--s-4); }
+
+/* ---------- Stepper (asistente de liquidación) ---------- */
+.th-stepper { display: flex; gap: var(--s-2); list-style: none; margin: 0; padding: 0; }
+.th-step { flex: 1; display: grid; gap: 8px; font-size: var(--text-sm); color: var(--ink-3); font-weight: 600; }
+.th-step__bar { height: 6px; border-radius: var(--r-full); background: var(--surface-3); overflow: hidden; }
+.th-step__bar i { display: block; height: 100%; width: 0; background: var(--brand); border-radius: inherit; }
+.th-step[data-state="done"] { color: var(--ink-2); }
+.th-step[data-state="done"] .th-step__bar i { width: 100%; }
+.th-step[data-state="current"] { color: var(--ink); }
+.th-step[data-state="current"] .th-step__bar i { width: 50%; }
+
+/* ---------- Progreso (previsto vs real) ---------- */
+.th-progress { height: 10px; border-radius: var(--r-full); background: var(--surface-3); overflow: hidden; }
+.th-progress > i { display: block; height: 100%; border-radius: inherit; background: var(--brand); transform-origin: left; }
+.th-progress--over > i { background: var(--danger); }
+
+/* ---------- Toast y diálogo ---------- */
+.th-toast { display: flex; align-items: center; gap: var(--s-3); padding: var(--s-3) var(--s-4); background: var(--ink); color: var(--bg);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-3); font-size: var(--text-sm); font-weight: 500; }
+.th-dialog { width: min(480px, 100%); background: var(--surface); border-radius: var(--r-xl); box-shadow: var(--shadow-3); padding: var(--s-6); display: grid; gap: var(--s-4); }
+.th-dialog__actions { display: flex; gap: var(--s-2); justify-content: flex-end; margin-top: var(--s-2); }
+.th-scrim { background: rgb(21 15 36 / 0.5); }
+
+/* ---------- Estado vacío con Tha ---------- */
+.th-empty { display: grid; justify-items: center; gap: var(--s-3); text-align: center; padding: var(--s-7) var(--s-5); }
+.th-empty img { width: 88px; height: auto; }
+.th-empty h3 { font-size: var(--text-lg); }
+.th-empty p { color: var(--ink-2); max-width: 36ch; }
+
+/* ---------- Contraseña con botón de mostrar/ocultar ---------- */
+.th-password { position: relative; }
+.th-password .th-input { padding-right: 48px; }
+.th-password__toggle {
+  position: absolute; right: 4px; top: 50%; translate: 0 -50%;
+  width: 36px; height: 36px; display: grid; place-items: center;
+  border: 0; border-radius: var(--r-sm); background: none; color: var(--ink-2); cursor: pointer;
+  transition-property: background-color, color, scale; transition-duration: var(--dur-base); transition-timing-function: var(--ease-out);
+}
+.th-password__toggle::after { content: ""; position: absolute; inset: -4px; } /* hit area ≥ 44 px */
+.th-password__toggle:hover { background: var(--surface-2); color: var(--ink); }
+.th-password__toggle:active { scale: var(--press-scale); }
+.th-password__toggle svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- Código de verificación (6 dígitos / recuperación) ---------- */
+.th-code { text-align: center; font: 600 1.75rem/1 var(--font-ui); font-variant-numeric: tabular-nums; letter-spacing: 0.35em; padding-left: 0.35em; min-height: 56px; }
+.th-code--text { font-size: var(--text-lg); letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* ---------- Selector de opciones sin indicador deslizante ---------- */
+.th-tabs--static .th-tab[aria-selected="true"] { background: var(--surface); box-shadow: var(--shadow-1); }
+
+/* ---------- Separador con texto ("o") ---------- */
+.th-divider { display: flex; align-items: center; gap: var(--s-3); color: var(--ink-3); font-size: var(--text-sm); }
+.th-divider::before, .th-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+/* ---------- QR y códigos de recuperación ---------- */
+.th-qr { width: 192px; height: 192px; border-radius: var(--r-lg); background: #fff; box-shadow: var(--shadow-1); padding: 8px; }
+.th-qr img { width: 100%; height: 100%; display: block; }
+.th-codes { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s-2); list-style: none; margin: 0; padding: var(--s-4); background: var(--surface-2); border-radius: var(--r-lg); }
+.th-codes li { font: 600 var(--text-md)/1.4 var(--font-ui); font-variant-numeric: tabular-nums; letter-spacing: 0.08em; }
+
+/* ---------- Etiqueta flotante ----------
+   La etiqueta hace de placeholder y sube al enfocar o al haber texto. Estructura:
+   <div class="th-float"><input class="th-input" placeholder=" " id="x"><label class="th-float__label" for="x">Email</label></div>
+   El placeholder debe ser un espacio (" "): :placeholder-shown es lo que detecta si el campo está vacío.
+   Sigue siendo un <label for> real, así que lectores de pantalla y gestores de contraseñas la entienden. */
+.th-float { position: relative; }
+.th-float .th-input { min-height: 52px; padding: 22px var(--s-3) 6px; }
+.th-float__label {
+  position: absolute; left: var(--s-3); top: 26px; max-width: calc(100% - 2 * var(--s-3));
+  font: 400 var(--text-md)/1 var(--font-ui); color: var(--ink-3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none;
+  transform-origin: left top; translate: 0 -50%;
+  transition-property: translate, scale, color; transition-duration: var(--dur-base); transition-timing-function: var(--ease-out);
+}
+.th-float .th-input:focus + .th-float__label,
+.th-float .th-input:not(:placeholder-shown) + .th-float__label,
+.th-float .th-input:-webkit-autofill + .th-float__label { translate: 0 calc(-50% - 13px); scale: 0.75; }
+.th-float .th-input:focus + .th-float__label { color: var(--brand); }
+.th-field[data-invalid="true"] .th-float__label { color: var(--danger); }
+.th-float .th-input:disabled + .th-float__label { opacity: 0.6; }
+/* Con el botón de ojo a la derecha, la etiqueta no debe pisarlo */
+.th-password.th-float .th-float__label { max-width: calc(100% - 64px); }

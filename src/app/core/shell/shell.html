@@ -1,0 +1,29 @@
+<div class="shell">
+  <aside class="shell__side">
+    <a class="shell__brand" routerLink="/"><img src="brand/tha-logo.svg" alt="" /> Tha</a>
+
+    <nav aria-label="Principal">
+      <ul>
+        @for (link of links(); track link.path) {
+          <li>
+            <a [routerLink]="link.path" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: link.exact }">
+              {{ link.label }}
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    @if (auth.user(); as user) {
+      <div class="shell__user">
+        <span class="shell__name">{{ user.name }} {{ user.surname }}</span>
+        <a class="shell__link" routerLink="/cuenta/seguridad" routerLinkActive="is-active">Seguridad de la cuenta</a>
+        <button class="th-btn th-btn--ghost" type="button" (click)="auth.logout()">Salir</button>
+      </div>
+    }
+  </aside>
+
+  <main class="shell__main">
+    <router-outlet />
+  </main>
+</div>

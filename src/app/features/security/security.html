@@ -1,0 +1,178 @@
+<header class="page-head" data-rise>
+  <h1>Seguridad de la cuenta</h1>
+  <p>
+    La verificación en dos pasos protege tu cuenta aunque alguien conozca tu contraseña: además de ella, hace falta un
+    código que solo tú recibes.
+  </p>
+</header>
+
+<div aria-live="polite">
+  @if (notice(); as text) {
+    <p class="auth__notice" role="status">{{ text }}</p>
+  }
+  @if (error(); as text) {
+    <p class="auth__error" role="alert">{{ text }}</p>
+  }
+</div>
+
+@if (newCodes(); as codes) {
+  <section class="th-card sec-card sec-card--highlight" aria-labelledby="codes-title">
+    <h2 id="codes-title">Guarda tus códigos de recuperación</h2>
+    <p>
+      Sirven para entrar si pierdes el móvil. <strong>Cada uno se usa una sola vez y no volverán a mostrarse.</strong>
+      Cópialos o descárgalos y guárdalos en un lugar seguro, como un gestor de contraseñas.
+    </p>
+    <ul class="th-codes">
+      @for (item of codes; track item) {
+        <li>{{ item }}</li>
+      }
+    </ul>
+    <div class="row">
+      <button class="th-btn" type="button" (click)="copyCodes()">{{ copied() ? 'Copiados' : 'Copiar' }}</button>
+      <button class="th-btn" type="button" (click)="downloadCodes()">Descargar .txt</button>
+      <button class="th-btn th-btn--primary" type="button" (click)="newCodes.set(null)">Ya los he guardado</button>
+    </div>
+  </section>
+}
+
+@if (status(); as s) {
+  <section class="th-card sec-card" data-rise>
+    <div class="sec-card__head">
+      <h2>Estado</h2>
+      @if (s.enabled) {
+        <span class="th-badge th-badge--success">Activada</span>
+      } @else {
+        <span class="th-badge th-badge--warning">Desactivada</span>
+      }
+    </div>
+    <p>
+      @if (s.enabled) {
+        Al iniciar sesión te pediremos un código además de la contraseña.
+      } @else {
+        Ahora mismo basta con la contraseña. Activa al menos un método.
+      }
+    </p>
+  </section>
+
+  <!-- App autenticadora -->
+  <section class="th-card sec-card" data-rise aria-labelledby="totp-title">
+    <div class="sec-card__head">
+      <h2 id="totp-title">App autenticadora</h2>
+      @if (has('TOTP')) {
+        <span class="th-badge th-badge--success">Activada</span>
+      }
+    </div>
+    <p>Google Authenticator, Microsoft Authenticator, Aegis, 1Password… Genera un código nuevo cada 30 segundos, sin cobertura.</p>
+
+    @if (panel() === 'totp' && totpSetup(); as setup) {
+      <div class="sec-steps">
+        <div>
+          <p><strong>1.</strong> Escanea este QR con tu app.</p>
+          <div class="th-qr"><img [src]="setup.qrDataUri" alt="Código QR para añadir Tha a tu app autenticadora" /></div>
+          <p class="th-hint sec-secret">
+            ¿No puedes escanear? Escribe esta clave a mano:
+            <code>{{ setup.secret }}</code>
+            <button class="auth__link" type="button" (click)="copySecret()">{{ copied() ? 'Copiada' : 'Copiar' }}</button>
+          </p>
+        </div>
+        <form (submit)="$event.preventDefault(); confirmTotp()" novalidate class="auth__form">
+          <div class="th-field">
+            <label class="th-label" for="totp-code"><strong>2.</strong> Escribe el código que muestra la app</label>
+            <input class="th-input th-code" id="totp-code" [formControl]="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000" />
+          </div>
+          <div class="row">
+            <button class="th-btn th-btn--primary" type="submit" [disabled]="busy() || code.invalid">Activar</button>
+            <button class="th-btn th-btn--ghost" type="button" (click)="cancel()">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    } @else if (panel() === 'disable-TOTP') {
+      <form [formGroup]="passwordForm" (ngSubmit)="confirmDisable('TOTP')" novalidate class="auth__form sec-inline">
+        <tha-password-field fieldId="pwd-totp" label="Confirma con tu contraseña" formControlName="password" />
+        <div class="row">
+          <button class="th-btn th-btn--danger" type="submit" [disabled]="busy()">Desactivar</button>
+          <button class="th-btn th-btn--ghost" type="button" (click)="cancel()">Cancelar</button>
+        </div>
+      </form>
+    } @else if (has('TOTP')) {
+      <div class="row"><button class="th-btn" type="button" (click)="ask('disable-TOTP')">Desactivar</button></div>
+    } @else {
+      <div class="row"><button class="th-btn th-btn--primary" type="button" [disabled]="busy()" (click)="startTotp()">Configurar</button></div>
+    }
+  </section>
+
+  <!-- Correo -->
+  <section class="th-card sec-card" data-rise aria-labelledby="email-title">
+    <div class="sec-card__head">
+      <h2 id="email-title">Código por correo</h2>
+      @if (has('EMAIL')) {
+        <span class="th-badge th-badge--success">Activado</span>
+      }
+    </div>
+    <p>Te enviamos un código de 6 dígitos a tu email cada vez que entras. Es más cómodo, pero tan seguro como tu correo.</p>
+
+    @if (panel() === 'email') {
+      <form (submit)="$event.preventDefault(); confirmEmail()" novalidate class="auth__form sec-inline">
+        <div class="th-field">
+          <label class="th-label" for="email-code">Código que te hemos enviado</label>
+          <input class="th-input th-code" id="email-code" [formControl]="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000" />
+        </div>
+        <div class="row">
+          <button class="th-btn th-btn--primary" type="submit" [disabled]="busy() || code.invalid">Activar</button>
+          <button class="th-btn th-btn--ghost" type="button" (click)="cancel()">Cancelar</button>
+        </div>
+      </form>
+    } @else if (panel() === 'disable-EMAIL') {
+      <form [formGroup]="passwordForm" (ngSubmit)="confirmDisable('EMAIL')" novalidate class="auth__form sec-inline">
+        <tha-password-field fieldId="pwd-email" label="Confirma con tu contraseña" formControlName="password" />
+        <div class="row">
+          <button class="th-btn th-btn--danger" type="submit" [disabled]="busy()">Desactivar</button>
+          <button class="th-btn th-btn--ghost" type="button" (click)="cancel()">Cancelar</button>
+        </div>
+      </form>
+    } @else if (has('EMAIL')) {
+      <div class="row"><button class="th-btn" type="button" (click)="ask('disable-EMAIL')">Desactivar</button></div>
+    } @else {
+      <div class="row"><button class="th-btn th-btn--primary" type="button" [disabled]="busy()" (click)="startEmail()">Activar</button></div>
+    }
+  </section>
+
+  @if (s.methods.length > 1) {
+    <section class="th-card sec-card" data-rise aria-labelledby="pref-title">
+      <h2 id="pref-title">Método preferido</h2>
+      <p>Es el que se te ofrece primero al entrar. Siempre puedes cambiar de método en esa pantalla.</p>
+      <div class="th-tabs th-tabs--static" role="radiogroup" aria-label="Método preferido">
+        @for (method of s.methods; track method) {
+          <button class="th-tab" role="radio" type="button" [attr.aria-checked]="s.preferredMethod === method"
+                  [attr.aria-selected]="s.preferredMethod === method" [disabled]="busy()" (click)="setPreferred(method)">
+            {{ method === 'TOTP' ? 'App autenticadora' : 'Correo' }}
+          </button>
+        }
+      </div>
+    </section>
+  }
+
+  @if (s.enabled) {
+    <section class="th-card sec-card" data-rise aria-labelledby="rec-title">
+      <div class="sec-card__head">
+        <h2 id="rec-title">Códigos de recuperación</h2>
+        <span class="th-badge" [class.th-badge--warning]="s.recoveryCodesLeft <= 2">{{ s.recoveryCodesLeft }} sin usar</span>
+      </div>
+      <p>Para entrar si pierdes el móvil o no te llega el correo. Al generar nuevos, los anteriores dejan de valer.</p>
+
+      @if (panel() === 'regenerate') {
+        <form [formGroup]="passwordForm" (ngSubmit)="confirmRegenerate()" novalidate class="auth__form sec-inline">
+          <tha-password-field fieldId="pwd-codes" label="Confirma con tu contraseña" formControlName="password" />
+          <div class="row">
+            <button class="th-btn th-btn--primary" type="submit" [disabled]="busy()">Generar nuevos códigos</button>
+            <button class="th-btn th-btn--ghost" type="button" (click)="cancel()">Cancelar</button>
+          </div>
+        </form>
+      } @else {
+        <div class="row"><button class="th-btn" type="button" (click)="ask('regenerate')">Generar nuevos códigos</button></div>
+      }
+    </section>
+  }
+} @else {
+  <p class="page-note" role="status">Cargando…</p>
+}

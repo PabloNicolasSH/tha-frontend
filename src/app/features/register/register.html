@@ -1,0 +1,64 @@
+<main class="auth">
+  <section class="auth__art" aria-hidden="true">
+    <img src="brand/tha-logo.svg" alt="" />
+  </section>
+
+  <section class="auth__panel">
+    <div class="auth__box">
+      @if (sent()) {
+        <h1 data-rise>Solicitud enviada</h1>
+        <p class="auth__lead" data-rise>
+          La federación revisará tu solicitud. Cuando la apruebe te llegará un email con un enlace para crear tu
+          contraseña.
+        </p>
+        <a class="th-btn th-btn--primary th-btn--lg" routerLink="/entrar" data-rise>Volver a entrar</a>
+      } @else {
+        <h1 data-rise>Solicita tu cuenta</h1>
+        <p class="auth__lead" data-rise>
+          Es para quienes participan en la federación. La aprobamos a mano y después podrás crear tu contraseña.
+        </p>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="auth__form" data-rise>
+          <div class="auth__row">
+            <div class="th-field" [attr.data-invalid]="invalid('name')">
+              <div class="th-float">
+                <input class="th-input" id="name" formControlName="name" autocomplete="given-name" placeholder=" " />
+                <label class="th-float__label" for="name">Nombre</label>
+              </div>
+              @if (invalid('name')) { <span class="th-error">Escribe tu nombre.</span> }
+            </div>
+            <div class="th-field" [attr.data-invalid]="invalid('surname')">
+              <div class="th-float">
+                <input class="th-input" id="surname" formControlName="surname" autocomplete="family-name" placeholder=" " />
+                <label class="th-float__label" for="surname">Apellidos</label>
+              </div>
+              @if (invalid('surname')) { <span class="th-error">Escribe tus apellidos.</span> }
+            </div>
+          </div>
+
+          <div class="th-field" [attr.data-invalid]="invalid('email')">
+            <div class="th-float">
+              <input class="th-input" id="email" type="email" formControlName="email" autocomplete="username" placeholder=" " />
+              <label class="th-float__label" for="email">Email</label>
+            </div>
+            @if (invalid('email')) {
+              <span class="th-error">Escribe un email válido.</span>
+            } @else {
+              <span class="th-hint">Aquí recibirás el enlace para crear tu contraseña.</span>
+            }
+          </div>
+
+          @if (error(); as message) {
+            <p class="auth__error" role="alert">{{ message }}</p>
+          }
+
+          <button class="th-btn th-btn--primary th-btn--lg" type="submit" [disabled]="busy()">
+            {{ busy() ? 'Enviando…' : 'Solicitar cuenta' }}
+          </button>
+        </form>
+
+        <p class="auth__switch" data-rise>¿Ya tienes cuenta? <a routerLink="/entrar">Entra</a></p>
+      }
+    </div>
+  </section>
+</main>

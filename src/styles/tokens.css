@@ -1,0 +1,123 @@
+/* Tha — design tokens v0.1
+   Fuente de verdad del sistema visual. El frontend Angular importa este archivo tal cual.
+   Colores derivados del logo (morado del elefante #673389, colmillo #f2d9bc). */
+
+:root {
+  /* ---- Marca (paleta cruda) ---- */
+  --purple-950: #1b1230;
+  --purple-900: #2e1f4e;
+  --purple-800: #3c2560;
+  --purple-700: #4a2266;
+  --purple-600: #572a77;
+  --purple-500: #673389;   /* color del logo */
+  --purple-400: #9766a2;
+  --purple-300: #c79ac3;   /* lila del logo */
+  --purple-100: #efe4f5;
+  --purple-50:  #f8f5fa;
+  --tusk-200:   #f2d9bc;   /* colmillo */
+  --tusk-500:   #cba47d;
+  --tusk-800:   #6b4a22;
+
+  /* ---- Roles (tema claro) ---- */
+  --bg:         #f8f5fa;
+  --surface:    #ffffff;
+  --surface-2:  #f1ecf5;
+  --surface-3:  #e8e0ee;
+  --ink:        #231a38;
+  --ink-2:      #5a4d73;
+  --ink-3:      #75698a;
+  --line:       rgb(35 26 56 / 0.12);
+  --line-strong:rgb(35 26 56 / 0.24);
+
+  --brand:        var(--purple-500);
+  --brand-hover:  var(--purple-600);
+  --brand-press:  var(--purple-700);
+  --brand-tint:   var(--purple-100);
+  --on-brand:     #ffffff;
+  --accent:       var(--tusk-200);
+  --accent-ink:   var(--tusk-800);
+
+  --success:      #1f7a55;  --success-tint: #e1f2ea;
+  --danger:       #b3283f;  --danger-tint:  #fbe4e8;
+  --warning:      #8f5509;  --warning-tint: #fbefd9;
+  --focus:        #673389;
+
+  /* ---- Tipografía ---- */
+  --font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  --font-ui:      "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-xs:   0.75rem;    /* 12 */
+  --text-sm:   0.875rem;   /* 14 */
+  --text-md:   1rem;       /* 16 */
+  --text-lg:   1.25rem;    /* 20 */
+  --text-xl:   1.75rem;    /* 28 */
+  --text-2xl:  2.5rem;     /* 40 */
+  --text-3xl:  clamp(2.75rem, 6vw, 5rem);
+
+  /* ---- Espaciado (base 4) ---- */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 72px; --s-9: 120px;
+
+  /* ---- Radios: regla concéntrica  exterior = interior + padding ---- */
+  --r-sm: 6px;    /* chips, badges, checkbox */
+  --r-md: 10px;   /* botones, inputs */
+  --r-lg: 16px;   /* paneles (10 + 6 de padding) */
+  --r-xl: 24px;   /* diálogos (16 + 8) */
+  --r-full: 999px;
+
+  /* ---- Elevación: capas transparentes, sin bordes falsos ---- */
+  --shadow-1: 0 0 0 1px rgb(35 26 56 / 0.06), 0 1px 2px rgb(35 26 56 / 0.06);
+  --shadow-2: 0 0 0 1px rgb(35 26 56 / 0.06), 0 2px 4px rgb(35 26 56 / 0.05), 0 8px 24px rgb(35 26 56 / 0.08);
+  --shadow-3: 0 0 0 1px rgb(35 26 56 / 0.08), 0 4px 8px rgb(35 26 56 / 0.06), 0 24px 56px rgb(35 26 56 / 0.18);
+
+  /* ---- Movimiento (GSAP lee estos valores desde motion.ts) ---- */
+  --dur-fast:   120ms;
+  --dur-base:   200ms;
+  --dur-slow:   400ms;
+  --ease-out:   cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-out:cubic-bezier(0.65, 0, 0.35, 1);
+  --press-scale: 0.96;
+
+  --control-h:   40px;   /* altura mínima de controles en escritorio */
+  --control-h-touch: 44px;
+}
+
+/* Tema oscuro: automático (preferencia del sistema) o forzado con data-theme="dark" */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #150f24;  --surface: #1e1632;  --surface-2: #281d40;  --surface-3: #33264f;
+    --ink: #f3edf8; --ink-2: #bcb0d2;    --ink-3: #9488ab;
+    --line: rgb(243 237 248 / 0.12);     --line-strong: rgb(243 237 248 / 0.26);
+    --brand: #c79ac3; --brand-hover: #d6b0d2; --brand-press: #e3c5df;
+    --brand-tint: rgb(199 154 195 / 0.16); --on-brand: #231a38;
+    --accent: #3a2c52; --accent-ink: #f2d9bc;
+    --success: #5fcf9f; --success-tint: rgb(95 207 159 / 0.14);
+    --danger:  #ff8097; --danger-tint:  rgb(255 128 151 / 0.14);
+    --warning: #f0b765; --warning-tint: rgb(240 183 101 / 0.14);
+    --focus: #c79ac3;
+    --shadow-1: 0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-2: 0 0 0 1px rgb(255 255 255 / 0.08), 0 8px 24px rgb(0 0 0 / 0.45);
+    --shadow-3: 0 0 0 1px rgb(255 255 255 / 0.1), 0 24px 56px rgb(0 0 0 / 0.6);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #150f24;  --surface: #1e1632;  --surface-2: #281d40;  --surface-3: #33264f;
+  --ink: #f3edf8; --ink-2: #bcb0d2;    --ink-3: #9488ab;
+  --line: rgb(243 237 248 / 0.12);     --line-strong: rgb(243 237 248 / 0.26);
+  --brand: #c79ac3; --brand-hover: #d6b0d2; --brand-press: #e3c5df;
+  --brand-tint: rgb(199 154 195 / 0.16); --on-brand: #231a38;
+  --accent: #3a2c52; --accent-ink: #f2d9bc;
+  --success: #5fcf9f; --success-tint: rgb(95 207 159 / 0.14);
+  --danger:  #ff8097; --danger-tint:  rgb(255 128 151 / 0.14);
+  --warning: #f0b765; --warning-tint: rgb(240 183 101 / 0.14);
+  --focus: #c79ac3;
+  --shadow-1: 0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-2: 0 0 0 1px rgb(255 255 255 / 0.08), 0 8px 24px rgb(0 0 0 / 0.45);
+  --shadow-3: 0 0 0 1px rgb(255 255 255 / 0.1), 0 24px 56px rgb(0 0 0 / 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-fast: 1ms; --dur-base: 1ms; --dur-slow: 1ms; }
+}
