@@ -1,0 +1,30 @@
+<div
+  class="th-toast"
+  [class.th-toast--success]="item().kind === 'success'"
+  [class.th-toast--error]="item().kind === 'error'"
+  [class.th-toast--info]="item().kind === 'info'"
+  [attr.role]="item().kind === 'error' ? 'alert' : 'status'"
+  [attr.aria-live]="item().kind === 'error' ? 'assertive' : 'polite'"
+  aria-atomic="true"
+  (mouseenter)="toast.pause(item().id)"
+  (mouseleave)="toast.resume(item().id)"
+  (focusin)="toast.pause(item().id)"
+  (focusout)="toast.resume(item().id)"
+  (keydown)="onKeydown($event)"
+>
+  @switch (item().kind) {
+    @case ('success') {
+      <svg class="th-toast__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="m8 12.5 3 3 5-6" /></svg>
+    }
+    @case ('error') {
+      <svg class="th-toast__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.5h.01" /></svg>
+    }
+    @default {
+      <svg class="th-toast__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v5.5M12 7.5h.01" /></svg>
+    }
+  }
+  <span class="th-toast__text">{{ item().message }}</span>
+  <button class="th-toast__close" type="button" aria-label="Cerrar aviso" (click)="toast.dismiss(item().id)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+  </button>
+</div>

@@ -1,0 +1,5 @@
+<section class="th-toasts" aria-label="Avisos">
+  @for (item of toast.items(); track item.id) {
+    <tha-toast-item [item]="item" />
+  }
+</section>

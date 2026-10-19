@@ -200,3 +200,29 @@ p { text-wrap: pretty; margin: 0; }
 .th-float .th-input:disabled + .th-float__label { opacity: 0.6; }
 /* Con el botón de ojo a la derecha, la etiqueta no debe pisarlo */
 .th-password.th-float .th-float__label { max-width: calc(100% - 64px); }
+
+/* ---------- Diálogo modal (elemento nativo <dialog>) ----------
+   showModal() da de serie: foco atrapado, Esc, fondo inerte y devolución del foco. */
+.th-modal { border: 0; padding: 0; background: transparent; color: var(--ink); overflow: visible;
+  width: min(480px, calc(100vw - 2 * var(--s-4))); max-width: none; }
+.th-modal::backdrop { background: rgb(21 15 36 / 0.5); }
+.th-modal .th-dialog { width: 100%; }
+.th-dialog__title { font-size: var(--text-xl); font-weight: 700; }
+.th-dialog__text { color: var(--ink-2); }
+body.th-scroll-locked { overflow: hidden; }
+.th-btn--danger-solid { --_bg: var(--danger); --_fg: #fff; --_bgh: color-mix(in oklab, var(--danger) 88%, black); box-shadow: none; }
+
+/* ---------- Avisos (toast) ---------- */
+.th-toasts { position: fixed; z-index: 1000; left: 50%; translate: -50% 0; bottom: var(--s-5);
+  display: grid; gap: var(--s-2); width: min(440px, calc(100vw - 2 * var(--s-4))); pointer-events: none; }
+.th-toasts > * { pointer-events: auto; }
+.th-toast__icon { flex: none; width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.th-toast--success .th-toast__icon { color: var(--success); }
+.th-toast--error .th-toast__icon { color: var(--danger); }
+.th-toast--info .th-toast__icon { color: var(--purple-300); }
+.th-toast__text { flex: 1; min-width: 0; }
+.th-toast__close { flex: none; position: relative; width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: var(--r-sm);
+  background: none; color: inherit; opacity: 0.7; cursor: pointer; transition: opacity var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out); }
+.th-toast__close::after { content: ""; position: absolute; inset: -8px; } /* hit area ≥ 44 px */
+.th-toast__close:hover { opacity: 1; background: rgb(128 128 128 / 0.2); }
+.th-toast__close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
