@@ -1,5 +1,7 @@
 # tha-frontend
 
+[![CI](https://github.com/PabloNicolasSH/tha-frontend/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/PabloNicolasSH/tha-frontend/actions/workflows/ci.yml)
+
 Web de **Tha** (Scouts de Canarias). Angular 22 · componentes propios (sin librería de UI) · GSAP · Vitest.
 
 ## Arrancar en local
@@ -18,6 +20,8 @@ Cuenta de desarrollo: `admin@tha.local` / `admin12345`.
 npm test -- --watch=false    # tests unitarios
 npm run build                # compilación de producción
 ```
+
+El **CI** de GitHub Actions (`.github/workflows/ci.yml`) ejecuta `npm ci`, los tests y la compilación de producción en cada pull request hacia `develop` o `main` y en cada `push` a esas ramas. La compilación falla si se superan los presupuestos de tamaño de `angular.json`.
 
 ## Marca y diseño
 
