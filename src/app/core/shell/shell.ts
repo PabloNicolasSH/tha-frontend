@@ -24,6 +24,7 @@ export class Shell {
     ];
     if (this.auth.hasRole('ADMIN', 'SECRETARY')) {
       links.push({ path: '/admin/solicitudes', label: 'Solicitudes de cuenta', exact: false });
+      links.push({ path: '/admin/grupos', label: 'Grupos scout', exact: false });
     }
     return links;
   });

@@ -1,0 +1,92 @@
+<header class="page-head" data-rise>
+  <h1>Grupos scout</h1>
+  <p>
+    El listado de grupos que se ofrece al pedir una cuenta. Un grupo con personas no se puede borrar: se desactiva y
+    conserva a sus personas.
+  </p>
+</header>
+
+<div data-rise>
+  @if (editing() === null) {
+    <p class="groups-actions"><button class="th-btn th-btn--primary" type="button" (click)="openNew()">Nuevo grupo</button></p>
+  } @else {
+    <form class="th-card groups-form" [formGroup]="form" (submit)="$event.preventDefault(); save()" novalidate>
+      <h2>{{ formTitle() }}</h2>
+
+      <div class="th-field" [attr.data-invalid]="invalid('name')">
+        <div class="th-float">
+          <input class="th-input" id="group-name" formControlName="name" placeholder=" " autocomplete="off" />
+          <label class="th-float__label" for="group-name">Nombre del grupo</label>
+        </div>
+        @if (invalid('name')) { <span class="th-error">Escribe el nombre del grupo.</span> }
+      </div>
+
+      <div class="th-field" [attr.data-invalid]="invalid('email')">
+        <div class="th-float">
+          <input class="th-input" id="group-email" type="email" formControlName="email" placeholder=" " autocomplete="off" />
+          <label class="th-float__label" for="group-email">Email de contacto (opcional)</label>
+        </div>
+        @if (invalid('email')) { <span class="th-error">Escribe un email válido.</span> }
+      </div>
+
+      <div class="th-field">
+        <label for="group-island">Isla</label>
+        <select class="th-select" id="group-island" formControlName="island">
+          <option value="">Sin indicar</option>
+          @for (island of islands(); track island.code) {
+            <option [value]="island.code">{{ island.name }}</option>
+          }
+        </select>
+      </div>
+
+      @if (formError(); as message) {
+        <p class="auth__error" role="alert">{{ message }}</p>
+      }
+
+      <div class="groups-form__buttons">
+        <button class="th-btn th-btn--primary" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Guardando…' : 'Guardar' }}
+        </button>
+        <button class="th-btn th-btn--ghost" type="button" [disabled]="saving()" (click)="closeForm()">Cancelar</button>
+      </div>
+    </form>
+  }
+
+  <tha-table
+    label="Grupos scout"
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [searchable]="true"
+    searchLabel="Buscar grupos"
+    emptyTitle="Todavía no hay grupos"
+    emptyText="Crea el primero con «Nuevo grupo»."
+  >
+    <ng-template thaCell="name" let-row>
+      <strong>{{ asGroup(row).name }}</strong>
+    </ng-template>
+
+    <ng-template thaCell="email" let-row>{{ asGroup(row).email ?? '—' }}</ng-template>
+
+    <ng-template thaCell="island" let-row>{{ islandName(asGroup(row).island) || '—' }}</ng-template>
+
+    <ng-template thaCell="active" let-row>
+      @if (asGroup(row).active) {
+        <span class="th-badge th-badge--success">Activo</span>
+      } @else {
+        <span class="th-badge th-badge--warning">Desactivado</span>
+      }
+    </ng-template>
+
+    <ng-template thaActions let-row>
+      @let g = asGroup(row);
+      <button class="th-btn" type="button" [disabled]="busyId() === g.id" (click)="openEdit(g)">Editar</button>
+      <button class="th-btn" type="button" [disabled]="busyId() === g.id" (click)="toggleActive(g)">
+        {{ g.active ? 'Desactivar' : 'Reactivar' }}
+      </button>
+      @if (g.members === 0) {
+        <button class="th-btn th-btn--ghost" type="button" [disabled]="busyId() === g.id" (click)="remove(g)">Borrar</button>
+      }
+    </ng-template>
+  </tha-table>
+</div>

@@ -42,6 +42,11 @@ export const routes: Routes = [
         canActivate: [roleGuard('ADMIN', 'SECRETARY')],
         loadComponent: () => import('./features/admin-requests/admin-requests').then((m) => m.AdminRequests),
       },
+      {
+        path: 'admin/grupos',
+        canActivate: [roleGuard('ADMIN', 'SECRETARY')],
+        loadComponent: () => import('./features/admin-groups/admin-groups').then((m) => m.AdminGroups),
+      },
     ],
   },
   { path: '**', redirectTo: '' },
