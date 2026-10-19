@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { AdminRequestsService } from '../../core/auth/admin-requests.service';
 import { AccountRequest } from '../../core/auth/auth.models';
+import { PublicGroup, PublicListsService } from '../../core/groups/public-lists.service';
 import { rise } from '../../core/motion/motion';
 import { Dialog } from '../../shared/ui/dialog/dialog.service';
 import { ThaActions, ThaCell } from '../../shared/ui/table/table.directives';
@@ -18,17 +19,20 @@ import { Toast } from '../../shared/ui/toast/toast.service';
 })
 export class AdminRequests implements OnInit, AfterViewInit {
   private readonly service = inject(AdminRequestsService);
+  private readonly lists = inject(PublicListsService);
   private readonly dialog = inject(Dialog);
   private readonly toast = inject(Toast);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly rows = signal<AccountRequest[]>([]);
+  protected readonly groups = signal<PublicGroup[]>([]);
   protected readonly loading = signal(true);
   protected readonly busyId = signal<number | null>(null);
 
   protected readonly columns: TableColumn<AccountRequest>[] = [
     { key: 'person', header: 'Persona', sortable: true, rowHeader: true, value: (r) => `${r.name} ${r.surname}` },
     { key: 'group', header: 'Grupo', sortable: true, value: (r) => r.scoutGroupName },
+    { key: 'branch', header: 'Rama', sortable: true, value: (r) => r.branchName },
     { key: 'createdAt', header: 'Solicitada', sortable: true, numeric: true, value: (r) => r.createdAt },
     { key: 'status', header: 'Estado', sortable: true, value: (r) => (r.status === 'PENDING' ? 'Pendiente' : 'Enlace enviado') },
   ];
@@ -40,7 +44,10 @@ export class AdminRequests implements OnInit, AfterViewInit {
 
   async ngOnInit(): Promise<void> {
     try {
-      this.rows.set(await this.service.list());
+      const [rows, groups] = await Promise.allSettled([this.service.list(), this.lists.groups()]);
+      if (groups.status === 'fulfilled') this.groups.set(groups.value);
+      if (rows.status === 'rejected') throw rows.reason;
+      this.rows.set(rows.value);
     } catch (e) {
       this.fail(e, 'No se han podido cargar las solicitudes.');
     } finally {
@@ -50,6 +57,21 @@ export class AdminRequests implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     rise(this.host.nativeElement.querySelectorAll('[data-rise]'));
+  }
+
+  /** Corrige el grupo antes de aprobar: la persona lo declara ella y quien aprueba lo verifica. */
+  protected async changeGroup(row: AccountRequest, event: Event): Promise<void> {
+    const select = event.target as HTMLSelectElement;
+    const groupId = select.value ? Number(select.value) : null;
+    await this.run(row, async () => {
+      try {
+        this.replace(await this.service.changeGroup(row.id, groupId));
+        this.toast.success('Grupo actualizado.');
+      } catch (e) {
+        select.value = row.scoutGroupId === null ? '' : String(row.scoutGroupId); // vuelve al valor guardado
+        throw e;
+      }
+    });
   }
 
   protected async approve(row: AccountRequest): Promise<void> {
