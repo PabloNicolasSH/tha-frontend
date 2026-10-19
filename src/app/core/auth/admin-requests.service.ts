@@ -13,6 +13,11 @@ export class AdminRequestsService {
     return firstValueFrom(this.http.get<AccountRequest[]>(this.base));
   }
 
+  /** Corrige el grupo que la persona declaró (null: sin grupo) mientras la solicitud está pendiente. */
+  changeGroup(id: number, scoutGroupId: number | null): Promise<AccountRequest> {
+    return firstValueFrom(this.http.put<AccountRequest>(`${this.base}/${id}/group`, { scoutGroupId }));
+  }
+
   /** Aprueba la solicitud y envía a la persona el enlace para crear su contraseña. */
   approve(id: number): Promise<AccountRequest> {
     return firstValueFrom(this.http.post<AccountRequest>(`${this.base}/${id}/approve`, {}));

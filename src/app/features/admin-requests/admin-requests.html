@@ -25,6 +25,27 @@
       </div>
     </ng-template>
 
+    <ng-template thaCell="group" let-row>
+      @let r = asRequest(row);
+      @if (r.status === 'PENDING') {
+        <select
+          class="th-select th-select--compact"
+          [attr.aria-label]="'Grupo de ' + r.name + ' ' + r.surname"
+          [disabled]="busyId() === r.id"
+          (change)="changeGroup(r, $event)"
+        >
+          <option value="" [selected]="r.scoutGroupId === null">Ninguno (federación)</option>
+          @for (group of groups(); track group.id) {
+            <option [value]="group.id" [selected]="group.id === r.scoutGroupId">{{ group.name }}</option>
+          }
+        </select>
+      } @else {
+        {{ r.scoutGroupName ?? 'Ninguno (federación)' }}
+      }
+    </ng-template>
+
+    <ng-template thaCell="branch" let-row>{{ asRequest(row).branchName ?? '—' }}</ng-template>
+
     <ng-template thaCell="createdAt" let-row>{{ asRequest(row).createdAt | date: 'dd/MM/yyyy' }}</ng-template>
 
     <ng-template thaCell="status" let-row>

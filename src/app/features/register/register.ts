@@ -1,8 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { Branch, PublicGroup, PublicListsService } from '../../core/groups/public-lists.service';
 import { nudge, rise } from '../../core/motion/motion';
 
 /** Solicitud de cuenta: sin contraseña. Cuando la federación la apruebe, llega un enlace para crearla. */
@@ -11,18 +12,31 @@ import { nudge, rise } from '../../core/motion/motion';
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
 })
-export class Register implements AfterViewInit {
+export class Register implements OnInit, AfterViewInit {
   private readonly auth = inject(AuthService);
+  private readonly lists = inject(PublicListsService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly form = inject(FormBuilder).nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(120)]],
     surname: ['', [Validators.required, Validators.maxLength(160)]],
     email: ['', [Validators.required, Validators.email]],
+    // Opcionales: '' es «Ninguno (federación)» / «Ninguna»
+    scoutGroupId: [''],
+    branchId: [''],
   });
+  protected readonly groups = signal<PublicGroup[]>([]);
+  protected readonly branches = signal<Branch[]>([]);
   protected readonly error = signal<string | null>(null);
   protected readonly busy = signal(false);
   protected readonly sent = signal(false);
+
+  async ngOnInit(): Promise<void> {
+    // Si las listas no cargan, la solicitud sigue siendo posible: grupo y rama son opcionales
+    const [groups, branches] = await Promise.allSettled([this.lists.groups(), this.lists.branches()]);
+    if (groups.status === 'fulfilled') this.groups.set(groups.value);
+    if (branches.status === 'fulfilled') this.branches.set(branches.value);
+  }
 
   ngAfterViewInit(): void {
     rise(this.host.nativeElement.querySelectorAll('[data-rise]'));
@@ -41,7 +55,12 @@ export class Register implements AfterViewInit {
     this.busy.set(true);
     this.error.set(null);
     try {
-      await this.auth.register(this.form.getRawValue());
+      const { scoutGroupId, branchId, ...person } = this.form.getRawValue();
+      await this.auth.register({
+        ...person,
+        scoutGroupId: scoutGroupId ? Number(scoutGroupId) : null,
+        branchId: branchId ? Number(branchId) : null,
+      });
       this.sent.set(true);
     } catch (e) {
       this.error.set(

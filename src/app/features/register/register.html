@@ -48,6 +48,28 @@
             }
           </div>
 
+          <div class="auth__row">
+            <div class="th-field">
+              <label class="th-label" for="scoutGroupId">Grupo (opcional)</label>
+              <select class="th-select" id="scoutGroupId" formControlName="scoutGroupId" aria-describedby="scoutGroupId-hint">
+                <option value="">Ninguno (federación)</option>
+                @for (group of groups(); track group.id) {
+                  <option [value]="group.id">{{ group.name }}</option>
+                }
+              </select>
+              <span class="th-hint" id="scoutGroupId-hint">La coordinación de tu grupo confirmará que perteneces a él.</span>
+            </div>
+            <div class="th-field">
+              <label class="th-label" for="branchId">Rama (opcional)</label>
+              <select class="th-select" id="branchId" formControlName="branchId">
+                <option value="">Ninguna</option>
+                @for (branch of branches(); track branch.id) {
+                  <option [value]="branch.id">{{ branch.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
           @if (error(); as message) {
             <p class="auth__error" role="alert">{{ message }}</p>
           }

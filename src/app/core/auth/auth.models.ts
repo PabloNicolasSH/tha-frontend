@@ -28,6 +28,7 @@ export interface RegisterRequest {
   name: string;
   surname: string;
   scoutGroupId?: number | null;
+  branchId?: number | null;
 }
 
 // ---------- Segundo factor ----------
@@ -86,6 +87,8 @@ export interface AccountRequest {
   name: string;
   surname: string;
   status: AccountRequestStatus;
+  scoutGroupId: number | null;
   scoutGroupName: string | null;
+  branchName: string | null;
   createdAt: string;
 }
