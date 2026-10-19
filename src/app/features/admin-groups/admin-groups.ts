@@ -104,7 +104,7 @@ export class AdminGroups implements OnInit, AfterViewInit {
       if (target === 'new') {
         const created = await this.service.create(input);
         this.rows.update((rows) => [...rows, created]);
-        this.toast.success(`Grupo ${created.name} creado.`);
+        this.toast.success(`«${created.name}» creado.`);
       } else if (target !== null) {
         this.replace(await this.service.update(target, input));
         this.toast.success('Cambios guardados.');
