@@ -1,0 +1,63 @@
+<div class="th-field" [attr.data-invalid]="error() ? true : null">
+  <div class="th-float th-combo">
+    <!-- placeholder=" " (un espacio): lo necesita la etiqueta flotante para saber si el campo está vacío -->
+    <input
+      class="th-input"
+      role="combobox"
+      aria-autocomplete="list"
+      aria-haspopup="listbox"
+      autocomplete="off"
+      autocapitalize="none"
+      spellcheck="false"
+      placeholder=" "
+      [id]="fieldId()"
+      [value]="text()"
+      [disabled]="disabled()"
+      [attr.aria-expanded]="open()"
+      [attr.aria-controls]="open() ? listId() : null"
+      [attr.aria-activedescendant]="activeId()"
+      [attr.aria-invalid]="error() ? true : null"
+      [attr.aria-describedby]="error() || hint() ? messageId() : null"
+      (input)="onInput($event)"
+      (click)="onClick()"
+      (keydown)="onKeydown($event)"
+      (blur)="onBlur()"
+    />
+    <label class="th-float__label" [for]="fieldId()">{{ label() }}</label>
+    <svg class="th-combo__chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+
+    @if (open()) {
+      <div class="th-combo__popup">
+        <ul class="th-combo__list" role="listbox" [id]="listId()" [attr.aria-label]="label()">
+          @for (option of shown(); track option.value; let i = $index) {
+            <li
+              role="option"
+              class="th-combo__option"
+              [id]="optionId(i)"
+              [class.is-active]="i === activeIndex()"
+              [attr.aria-selected]="isSelected(option)"
+              (mousedown)="$event.preventDefault()"
+              (click)="choose(option)"
+            >
+              <span>{{ option.label }}</span>
+              @if (option.hint) { <span class="th-combo__hint">{{ option.hint }}</span> }
+            </li>
+          }
+        </ul>
+        <div class="th-combo__status" role="status">
+          @if (loading()) {
+            {{ loadingText() }}
+          } @else if (shown().length === 0) {
+            {{ emptyText() }}
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (error(); as message) {
+    <span class="th-error" [id]="messageId()">{{ message }}</span>
+  } @else if (hint(); as message) {
+    <span class="th-hint" [id]="messageId()">{{ message }}</span>
+  }
+</div>

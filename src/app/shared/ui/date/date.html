@@ -1,0 +1,108 @@
+<div class="th-field" [attr.data-invalid]="message() ? true : null" (focusout)="onFocusOut($event)">
+  <div class="th-float th-date">
+    @if (native()) {
+      <input
+        class="th-input th-date__native"
+        type="date"
+        [id]="fieldId()"
+        [value]="text()"
+        [min]="min()"
+        [max]="max()"
+        [disabled]="disabled()"
+        [attr.aria-invalid]="message() ? true : null"
+        [attr.aria-describedby]="messageId()"
+        (input)="onNativeInput($event)"
+        (blur)="onBlur()"
+      />
+    } @else {
+      <!-- placeholder=" " (un espacio): lo necesita la etiqueta flotante para saber si el campo está vacío -->
+      <input
+        class="th-input"
+        type="text"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder=" "
+        maxlength="10"
+        [id]="fieldId()"
+        [value]="text()"
+        [disabled]="disabled()"
+        [attr.aria-invalid]="message() ? true : null"
+        [attr.aria-describedby]="messageId()"
+        (input)="onInput($event)"
+        (blur)="onBlur()"
+      />
+    }
+    <label class="th-float__label" [for]="fieldId()">{{ label() }}</label>
+
+    @if (!native()) {
+      <button
+        class="th-date__toggle"
+        type="button"
+        aria-haspopup="dialog"
+        [attr.aria-expanded]="open()"
+        [attr.aria-controls]="open() ? dialogId() : null"
+        [attr.aria-label]="'Elegir fecha: ' + label()"
+        [disabled]="disabled()"
+        (click)="toggle()"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+          <path d="M3.5 10h17M8 3v4M16 3v4" />
+        </svg>
+      </button>
+
+      @if (open()) {
+        <div class="th-date__popup" role="dialog" aria-label="Calendario" [id]="dialogId()">
+          <div class="th-date__head">
+            <button class="th-date__nav" type="button" aria-label="Mes anterior" (click)="shiftMonth(-1)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
+            </button>
+            <strong class="th-date__title" aria-live="polite">{{ title() }}</strong>
+            <button class="th-date__nav" type="button" aria-label="Mes siguiente" (click)="shiftMonth(1)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+            </button>
+          </div>
+
+          <table class="th-date__grid" role="grid" [attr.aria-label]="title()" (keydown)="onGridKeydown($event)">
+            <thead>
+              <tr>
+                @for (day of weekdays; track day.full) {
+                  <th scope="col" [attr.abbr]="day.full"><span aria-hidden="true">{{ day.short }}</span><span class="th-sr-only">{{ day.full }}</span></th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (week of grid(); track week[0].iso) {
+                <tr>
+                  @for (day of week; track day.iso) {
+                    <td role="gridcell" [attr.aria-selected]="day.iso === value()">
+                      <button
+                        type="button"
+                        class="th-date__day"
+                        [class.is-outside]="!day.inMonth"
+                        [class.is-today]="day.iso === today"
+                        [class.is-selected]="day.iso === value()"
+                        [attr.data-iso]="day.iso"
+                        [attr.tabindex]="tabindex(day)"
+                        [attr.aria-label]="label_(day.iso)"
+                        [attr.aria-current]="day.iso === today ? 'date' : null"
+                        [disabled]="isDisabled(day.iso)"
+                        (click)="pick(day.iso)"
+                      >{{ day.day }}</button>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+
+  @if (message(); as text) {
+    <span class="th-error" [id]="messageId()">{{ text }}</span>
+  } @else {
+    <span class="th-hint" [id]="messageId()">{{ helper() }}</span>
+  }
+</div>
