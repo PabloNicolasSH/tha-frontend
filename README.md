@@ -38,6 +38,10 @@ Pantallas: `/entrar` (con "Mantener sesión iniciada", segundo paso de 2FA y bot
 - `shared/ui/password-field`: campo de contraseña con botón para mostrarla u ocultarla (compatible con formularios reactivos). Úsalo en cualquier campo de contraseña.
 - El SSO es una **navegación completa** (`<a href="/oauth2/authorization/…">`), no una petición XHR; por eso `proxy.conf.json` también reenvía `/oauth2` y `/login/oauth2`.
 
+## Cómo contribuir
+
+Ramas (git flow), commits en inglés con Conventional Commits, pull requests y protección de ramas: ver [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Estructura
 
 ```
