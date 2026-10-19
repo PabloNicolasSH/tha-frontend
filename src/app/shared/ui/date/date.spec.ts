@@ -162,6 +162,32 @@ describe('ThaDate', () => {
       expect(root.querySelector('.th-date__title')!.textContent).toContain('noviembre de 2025');
     });
 
+    it('cambiar de mes con el teclado no cierra el calendario aunque el día enfocado desaparezca', async () => {
+      const { host, toggle, root, fixture } = setup();
+      host.control.setValue('2026-10-19');
+      await settle(fixture);
+      toggle().click();
+      await settle(fixture);
+      const grid = root.querySelector<HTMLElement>('[role="grid"]')!;
+
+      // el navegador pierde el foco justo después, cuando se quita del DOM el día enfocado
+      grid.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown', bubbles: true, cancelable: true }));
+      root.querySelector('.th-field')!.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }));
+      await settle(fixture);
+
+      expect(root.querySelector('[role="dialog"]')).not.toBeNull();
+      expect(root.querySelector('.th-date__title')!.textContent).toContain('noviembre de 2026');
+    });
+
+    it('salir del campo con el calendario abierto lo cierra', async () => {
+      const { toggle, root, fixture } = setup();
+      toggle().click();
+      await settle(fixture);
+      root.querySelector('.th-field')!.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }));
+      await settle(fixture);
+      expect(root.querySelector('[role="dialog"]')).toBeNull();
+    });
+
     it('Esc cierra el calendario y devuelve el foco al botón', async () => {
       const { toggle, root, press, fixture } = setup();
       toggle().click();

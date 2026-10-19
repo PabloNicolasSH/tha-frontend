@@ -55,6 +55,8 @@ export class ThaDate implements ControlValueAccessor, Validator {
 
   private onChange: (value: string | null) => void = () => {};
   private onValidatorChange: () => void = () => {};
+  /** Al cambiar de mes el día enfocado desaparece y el foco se pierde un instante: eso no es salir del campo. */
+  private navigating = false;
 
   constructor() {
     // Los errores dependen del texto y del rango: cuando cambian, el formulario debe volver a validar
@@ -145,11 +147,14 @@ export class ThaDate implements ControlValueAccessor, Validator {
   }
 
   protected onFocusOut(event: FocusEvent): void {
+    if (this.navigating) return;
     const next = event.relatedTarget as Node | null;
     if (this.open() && !(next && this.host.nativeElement.contains(next))) this.close(false);
   }
 
   protected shiftMonth(step: number): void {
+    this.navigating = true;
+    queueMicrotask(() => setTimeout(() => (this.navigating = false)));
     this.focusIso.set(clamp(addMonths(this.focusIso(), step), this.min(), this.max()));
   }
 
@@ -194,12 +199,18 @@ export class ThaDate implements ControlValueAccessor, Validator {
         return;
     }
     event.preventDefault();
+    this.navigating = true;
     this.focusIso.set(clamp(next, this.min(), this.max()));
     this.focusDay();
   }
 
   private focusDay(): void {
-    queueMicrotask(() => setTimeout(() => this.host.nativeElement.querySelector<HTMLElement>(`[data-iso="${this.focusIso()}"]`)?.focus()));
+    queueMicrotask(() =>
+      setTimeout(() => {
+        this.host.nativeElement.querySelector<HTMLElement>(`[data-iso="${this.focusIso()}"]`)?.focus();
+        this.navigating = false;
+      }),
+    );
   }
 
   // ---------- ControlValueAccessor y Validator ----------

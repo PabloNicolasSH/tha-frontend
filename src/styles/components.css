@@ -297,7 +297,8 @@ body.th-scroll-locked { overflow: hidden; }
 .th-date__popup { position: absolute; z-index: 20; left: 0; top: calc(100% + 4px); width: min(320px, calc(100vw - 2 * var(--s-4)));
   background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow-3); padding: var(--s-3); }
 .th-date__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s-2); }
-.th-date__title { text-transform: capitalize; font-weight: 700; }
+.th-date__title { font-weight: 700; }
+.th-date__title::first-letter { text-transform: uppercase; }
 .th-date__grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .th-date__grid th { font-size: var(--text-xs); font-weight: 600; color: var(--ink-2); padding: var(--s-1) 0; text-align: center; }
 .th-date__grid td { padding: 1px; text-align: center; }
