@@ -1,0 +1,15 @@
+<dialog
+  #dialog
+  class="th-modal"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-labelledby]="titleId"
+  (cancel)="onCancel($event)"
+  (click)="onClick($event)"
+  (close)="onNativeClose()"
+>
+  <div class="th-dialog" #panel>
+    <h2 class="th-dialog__title" [id]="titleId">{{ heading() }}</h2>
+    <ng-content />
+  </div>
+</dialog>

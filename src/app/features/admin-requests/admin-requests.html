@@ -1,19 +1,10 @@
 <header class="page-head" data-rise>
   <h1>Solicitudes de cuenta</h1>
   <p>
-    Aprueba a quien participa en la federación y le llegará un enlace para crear su contraseña. El enlace caduca a las
-    48 horas.
+    Aprueba a quien participa en la federación y le llegará un enlace para crear su contraseña. El
+    enlace caduca a las 48 horas.
   </p>
 </header>
-
-<div aria-live="polite">
-  @if (message(); as text) {
-    <p class="auth__notice" role="status">{{ text }}</p>
-  }
-  @if (error(); as text) {
-    <p class="auth__error" role="alert">{{ text }}</p>
-  }
-</div>
 
 @if (loading()) {
   <p class="page-note" role="status">Cargando solicitudes…</p>
@@ -39,7 +30,8 @@
         @for (row of rows(); track row.id) {
           <tr>
             <td>
-              <strong>{{ row.name }} {{ row.surname }}</strong><br />
+              <strong>{{ row.name }} {{ row.surname }}</strong
+              ><br />
               <span class="cell-sub">{{ row.email }}</span>
             </td>
             <td>{{ row.scoutGroupName ?? '—' }}</td>
@@ -52,22 +44,33 @@
               }
             </td>
             <td class="cell-actions">
-              @if (confirmingId() === row.id) {
-                <span class="cell-sub">¿Rechazar a {{ row.name }}?</span>
-                <button class="th-btn th-btn--danger" type="button" [disabled]="busyId() === row.id" (click)="reject(row)">Sí, rechazar</button>
-                <button class="th-btn th-btn--ghost" type="button" (click)="confirmingId.set(null)">Cancelar</button>
+              @if (row.status === 'PENDING') {
+                <button
+                  class="th-btn th-btn--primary"
+                  type="button"
+                  [disabled]="busyId() === row.id"
+                  (click)="approve(row)"
+                >
+                  {{ busyId() === row.id ? 'Enviando…' : 'Aprobar' }}
+                </button>
               } @else {
-                @if (row.status === 'PENDING') {
-                  <button class="th-btn th-btn--primary" type="button" [disabled]="busyId() === row.id" (click)="approve(row)">
-                    {{ busyId() === row.id ? 'Enviando…' : 'Aprobar' }}
-                  </button>
-                } @else {
-                  <button class="th-btn" type="button" [disabled]="busyId() === row.id" (click)="resend(row)">
-                    {{ busyId() === row.id ? 'Enviando…' : 'Reenviar enlace' }}
-                  </button>
-                }
-                <button class="th-btn th-btn--ghost" type="button" [disabled]="busyId() === row.id" (click)="confirmingId.set(row.id)">Rechazar</button>
+                <button
+                  class="th-btn"
+                  type="button"
+                  [disabled]="busyId() === row.id"
+                  (click)="resend(row)"
+                >
+                  {{ busyId() === row.id ? 'Enviando…' : 'Reenviar enlace' }}
+                </button>
               }
+              <button
+                class="th-btn th-btn--ghost"
+                type="button"
+                [disabled]="busyId() === row.id"
+                (click)="reject(row)"
+              >
+                Rechazar
+              </button>
             </td>
           </tr>
         }

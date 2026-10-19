@@ -1,0 +1,28 @@
+@if (shown(); as pending) {
+  <tha-dialog [heading]="pending.options.title" [open]="open()" (openChange)="onOpenChange($event)" (closed)="onClosed()">
+    @if (pending.options.text) {
+      <p class="th-dialog__text">{{ pending.options.text }}</p>
+    }
+    <div class="th-dialog__actions">
+      <!-- autofocus: en una acción destructiva el foco empieza en "Cancelar" -->
+      <button
+        class="th-btn th-btn--ghost"
+        type="button"
+        [attr.autofocus]="pending.options.danger ? '' : null"
+        (click)="decide(false)"
+      >
+        {{ pending.options.cancelLabel ?? 'Cancelar' }}
+      </button>
+      <button
+        class="th-btn"
+        [class.th-btn--danger-solid]="pending.options.danger"
+        [class.th-btn--primary]="!pending.options.danger"
+        type="button"
+        [attr.autofocus]="pending.options.danger ? null : ''"
+        (click)="decide(true)"
+      >
+        {{ pending.options.confirmLabel ?? 'Aceptar' }}
+      </button>
+    </div>
+  </tha-dialog>
+}
