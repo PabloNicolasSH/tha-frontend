@@ -5,12 +5,15 @@ import { AdminRequestsService } from '../../core/auth/admin-requests.service';
 import { AccountRequest } from '../../core/auth/auth.models';
 import { rise } from '../../core/motion/motion';
 import { Dialog } from '../../shared/ui/dialog/dialog.service';
+import { ThaActions, ThaCell } from '../../shared/ui/table/table.directives';
+import { TableColumn } from '../../shared/ui/table/table.models';
+import { ThaTable } from '../../shared/ui/table/table';
 import { Toast } from '../../shared/ui/toast/toast.service';
 
 /** Bandeja de solicitudes de cuenta: la federación aprueba (y se envía el enlace) o rechaza. */
 @Component({
   selector: 'tha-admin-requests',
-  imports: [DatePipe],
+  imports: [DatePipe, ThaTable, ThaCell, ThaActions],
   templateUrl: './admin-requests.html',
 })
 export class AdminRequests implements OnInit, AfterViewInit {
@@ -22,6 +25,18 @@ export class AdminRequests implements OnInit, AfterViewInit {
   protected readonly rows = signal<AccountRequest[]>([]);
   protected readonly loading = signal(true);
   protected readonly busyId = signal<number | null>(null);
+
+  protected readonly columns: TableColumn<AccountRequest>[] = [
+    { key: 'person', header: 'Persona', sortable: true, rowHeader: true, value: (r) => `${r.name} ${r.surname}` },
+    { key: 'group', header: 'Grupo', sortable: true, value: (r) => r.scoutGroupName },
+    { key: 'createdAt', header: 'Solicitada', sortable: true, numeric: true, value: (r) => r.createdAt },
+    { key: 'status', header: 'Estado', sortable: true, value: (r) => (r.status === 'PENDING' ? 'Pendiente' : 'Enlace enviado') },
+  ];
+
+  /** Las plantillas de celda reciben la fila sin tipo; aquí se recupera. */
+  protected asRequest(row: unknown): AccountRequest {
+    return row as AccountRequest;
+  }
 
   async ngOnInit(): Promise<void> {
     try {

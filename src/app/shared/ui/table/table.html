@@ -1,0 +1,127 @@
+<div class="th-tablewrap">
+  @if (searchable()) {
+    <div class="th-table-toolbar">
+      <div class="th-search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg>
+        <input
+          class="th-input"
+          type="search"
+          [attr.aria-label]="searchLabel()"
+          [placeholder]="searchLabel() + '…'"
+          [value]="search()"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </div>
+    </div>
+  }
+
+  @if (error(); as message) {
+    <div class="th-card th-empty" role="alert">
+      <h3>No se han podido cargar los datos</h3>
+      <p>{{ message }}</p>
+      <button class="th-btn" type="button" (click)="retry.emit()">Reintentar</button>
+    </div>
+  } @else if (!loading() && visibleRows().length === 0) {
+    <div class="th-card th-empty">
+      <img src="brand/tha-logo.svg" alt="" />
+      <h3>{{ emptyTitle() }}</h3>
+      @if (emptyText()) {
+        <p>{{ emptyText() }}</p>
+      }
+    </div>
+  } @else {
+    <div class="th-card table-card">
+      <table class="th-table th-table--stack" [attr.aria-label]="label()" [attr.aria-busy]="loading()">
+        <thead>
+          <tr>
+            @for (col of columns(); track col.key) {
+              <th scope="col" [class.th-r]="col.numeric" [attr.aria-sort]="ariaSort(col)">
+                @if (col.sortable) {
+                  <button class="th-sort" type="button" (click)="toggleSort(col)">
+                    {{ col.header }}
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      @switch (ariaSort(col)) {
+                        @case ('ascending') { <path d="m7 14 5-5 5 5" /> }
+                        @case ('descending') { <path d="m7 10 5 5 5-5" /> }
+                        @default { <path d="m8 9 4-4 4 4M8 15l4 4 4-4" /> }
+                      }
+                    </svg>
+                  </button>
+                } @else {
+                  {{ col.header }}
+                }
+              </th>
+            }
+            @if (actions()) {
+              <th scope="col"><span class="th-sr">Acciones</span></th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            @for (row of skeleton(); track $index) {
+              <tr aria-hidden="true">
+                @for (col of columns(); track col.key) {
+                  <td [attr.data-label]="col.header"><span class="th-skeleton"></span></td>
+                }
+                @if (actions()) {
+                  <td><span class="th-skeleton"></span></td>
+                }
+              </tr>
+            }
+          } @else {
+            @for (row of visibleRows(); track row) {
+              <tr>
+                @for (col of columns(); track col.key) {
+                  @if (col.rowHeader) {
+                    <th scope="row" [attr.data-label]="col.header" [class.th-r]="col.numeric">
+                      @if (cellTemplate(col.key); as tpl) {
+                        <ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="{ $implicit: row }" />
+                      } @else {
+                        {{ display(col, row) }}
+                      }
+                    </th>
+                  } @else {
+                    <td [attr.data-label]="col.header" [class.th-r]="col.numeric">
+                      @if (cellTemplate(col.key); as tpl) {
+                        <ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="{ $implicit: row }" />
+                      } @else {
+                        {{ display(col, row) }}
+                      }
+                    </td>
+                  }
+                }
+                @if (actions(); as acts) {
+                  <td class="th-actions">
+                    <ng-container [ngTemplateOutlet]="acts.template" [ngTemplateOutletContext]="{ $implicit: row }" />
+                  </td>
+                }
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (loading()) {
+      <span class="th-sr" role="status">Cargando…</span>
+    }
+
+    @if (showPager()) {
+      <nav class="th-pager" aria-label="Paginación de {{ label() }}">
+        <span role="status" class="th-num">{{ firstShown() }}–{{ lastShown() }} de {{ totalCount() }}</span>
+        <div class="th-pager__nav">
+          <label class="th-sr" for="page-size">Filas por página</label>
+          <select class="th-select" id="page-size" [value]="pageSize()" (change)="setPageSize($any($event.target).value)">
+            @for (size of pageSizes(); track size) {
+              <option [value]="size" [selected]="size === pageSize()">{{ size }} por página</option>
+            }
+          </select>
+          <button class="th-btn" type="button" [disabled]="page() === 0" (click)="goTo(page() - 1)">Anterior</button>
+          <span class="th-num">Página {{ page() + 1 }} de {{ pageCount() }}</span>
+          <button class="th-btn" type="button" [disabled]="page() >= pageCount() - 1" (click)="goTo(page() + 1)">Siguiente</button>
+        </div>
+      </nav>
+    }
+  }
+</div>
